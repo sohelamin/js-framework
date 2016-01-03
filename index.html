@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>My JavaScript Framework</title>
+    </head>
+    <body>
+        <div id="app">
+            {{ message }} <br>
+            <input b-model="message"><br>
+            <br><input b-model="message"><br>
+            {{ message }} <br>
+            <input b-model="myself"><br>
+            {{ myself }}
+        </div>
+
+        <script src="main.js"></script>
+        <script type="text/javascript">
+            new Bangla({
+                el: '#app',
+                data: {
+                    message: 'Hello World!',
+                    myself: 'Sohel Amin'
+                }
+            });
+        </script>
+    </body>
+</html>
