@@ -80,14 +80,6 @@ Bangla.prototype = {
     renderModel: function(model) {
         var self = this;
 
-        var oldData = self.appInnerHTML;
-
-        var open = self.delimiters[0];
-        var close = self.delimiters[1];
-
-        var regex;
-        var newData;
-
         if (typeof model === 'string' && self.modelNodes[model]) {
             self.modelNodes[model].forEach(function(node) {
                 node.nodeValue = self.data[model];
