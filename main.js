@@ -15,8 +15,11 @@ var Bangla = function (options) {
 
     self.loadModelDataToElements(self.data);
 
+    var timeout;
     self.mainElement.addEventListener("keyup", function(e) {
         if (e.target !== e.currentTarget) {
+
+            // Execute the listener
             var currentElementModel = e.target.getAttribute('b-model');
 
             if (self.data.hasOwnProperty(currentElementModel)) {
@@ -25,6 +28,7 @@ var Bangla = function (options) {
                 self.renderModel(currentElementModel);
                 self.loadModelDataToElements(self.data);
             }
+
         }
 
         e.stopPropagation();
@@ -39,15 +43,33 @@ Bangla.prototype = {
 
         if (self.mainElement.hasChildNodes()) {
 
+            var nodes = self.mainElement.childNodes;
+            var value, regex, docFragment;
+
+            // Split the matched textNode into multiple nodes
             [].forEach.call(self.mainElement.childNodes, function(node) {
                 if (node.nodeValue != null) {
-                    var value = node.nodeValue.trim();
+                    value = node.nodeValue.trim();
 
                     for(model in self.data) {
-                        var regex = new RegExp(self.delimiters[0] + '\\s*' + model + '\\s*' + self.delimiters[1], 'g');
+                        regex = new RegExp(self.delimiters[0] + '\\s*' + model + '\\s*' + self.delimiters[1], 'g');
 
                         if (value.match(regex) && value != null) {
+                            highlightNodeText(self.mainElement, node, regex);
+                        }
+                    }
+                }
+            });
 
+            // Store the node for interaction
+            [].forEach.call(self.mainElement.childNodes, function(node) {
+                if (node.nodeValue != null) {
+                    value = node.nodeValue.trim();
+
+                    for(model in self.data) {
+                        regex = new RegExp(self.delimiters[0] + '\\s*' + model + '\\s*' + self.delimiters[1], 'g');
+
+                        if (value.match(regex) && value != null) {
                             if (self.modelNodes.hasOwnProperty(model)) {
                                 var data = [];
                                 data = self.modelNodes[model];
@@ -62,7 +84,9 @@ Bangla.prototype = {
                     }
                 }
             });
+
         }
+
     },
     loadModelDataToElements: function(models) {
         var self = this;
@@ -87,3 +111,40 @@ Bangla.prototype = {
         }
     }
 };
+
+/**
+ * Helpers function start here
+ */
+function strpos (haystack, needle, offset) {
+    var i = (haystack+'').indexOf(needle, (offset || 0));
+
+    return i === -1 ? false : i;
+}
+
+function highlightNodeText(mainElement, node, keywords) {
+    var text = node.textContent;
+    node.textContent = ""; // Clear the node
+    var match, pos = 0;
+    var before, beforeNode, after, afterNode, targetNode;
+
+    var docFragment = document.createDocumentFragment();
+
+    while (match = keywords.exec(text)) {
+        before = text.slice(pos, match.index);
+        pos = keywords.lastIndex;
+        after = text.slice(pos);
+
+        beforeNode = document.createTextNode(before);
+        targetNode = document.createTextNode(match[0]);
+        afterNode = document.createTextNode(after);
+
+        docFragment.appendChild(beforeNode);
+        docFragment.appendChild(targetNode);
+    }
+
+    if (afterNode) {
+        docFragment.appendChild(afterNode);
+        node.parentNode.replaceChild(docFragment, node);
+    }
+
+}
